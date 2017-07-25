@@ -1,6 +1,6 @@
 import sys
 import pygame
-from bullet import Bullet
+from bullet import Bullet 
 from alien import Alien
 
 
@@ -26,6 +26,20 @@ def check_keyup_events(event, ship):
         ship.moving_right = False
     elif event.key == pygame.K_LEFT:
         ship.moving_left = False
+
+def change_fleet_direction(ai_settings, aliens):
+    """Drop the entire fleet and change the fleet's direction."""
+    for alien in aliens.sprites():
+        alien.rect.y += ai_settings.fleet_drop_speed
+    ai_settings.fleet_direction *= -1
+
+
+def check_fleet_edges(ai_settings, aliens):
+    """Respond if aliens have reached an edge."""
+    for alien in aliens.sprites():
+        if alien.check_edges():
+            change_fleet_direction(ai_settings, aliens)
+        break
 
 def check_events(ai_settings, screen, ship, bullets):
     '''Respond to keypress and mouse events.'''
@@ -84,3 +98,8 @@ def update_bullets(bullets):
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+
+def update_aliens(ai_settings, aliens):
+    """Update the positions of all aliens"""
+    check_fleet_edges(ai_settings, aliens)
+    aliens.update()
